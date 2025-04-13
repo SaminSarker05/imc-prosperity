@@ -13,8 +13,8 @@ class Trader:
     """
         weighted mid price with volume imbalance strategy
         - calculate fair price with volume weighted average of best bid ask prices
-        - adjust fair price based on volume impanance in order book
-            - scale by half bid-ask spread
+        - adjust fair price based on volume imbalance in order book
+            - scale by half of bid-ask spread
     """
 
     def run(self, state: TradingState):
@@ -26,7 +26,8 @@ class Trader:
             order_depth: OrderDepth = state.order_depths[product]
             orders: List[Order] = []
             fair_price = 10
-    
+
+            # require outstanding buy/sell orders in market
             if len(order_depth.sell_orders) != 0 and len(order_depth.buy_orders) != 0:
                 ask_price, ask_vol = list(order_depth.sell_orders.items())[0]
                 bid_price, bid_vol = list(order_depth.buy_orders.items())[0]
