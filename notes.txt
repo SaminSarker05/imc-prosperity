@@ -4,6 +4,17 @@ day 1:
     - squid_ink
 
 
+---- trading
+
+outsanding = open/active
+ask = lowest price seller willing to sell
+bid = highest price buyer willing to buy
+
+orderbooks often sorted so can grab best ask/bid prices from top
+
+
+---- game
+
 goal: earn as many seashells as possible to bring island to prosperity through algorithmic trading
     - use algo to decide fair value price and price_levels to build trades
 
@@ -53,6 +64,7 @@ trading container based on AWS lambda function
     - buy_orders, sell_orders
     - all outsanding buy/sell
     - keys are price_levels and quanity for that price, negative for sell_orders 
+    - negative quantiies for sell_orders
 
 [Order]:
     - value for return result dictionary of run method
@@ -60,7 +72,10 @@ trading container based on AWS lambda function
     
     - symbol, price (max for buy, min for sell), quantity
 
-python notes:
+traderData: value keeps state details beetween run iterations
+
+
+---- python
 
 typing module for support of type hints and type checking
     variable_name: variable_type
