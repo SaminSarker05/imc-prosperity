@@ -25,10 +25,11 @@ class Trader:
                 ask_price, ask_vol = list(order_depth.sell_orders.items())[0]
                 bid_price, bid_vol = list(order_depth.buy_orders.items())[0]
 
-                mid_price = ((ask_price * ask_vol) + (bid_price * bid_vol)) / (ask_vol + bid_vol)
-                volume_imbalance = (bid_vol - ask_vol) / (bid_vol + ask_vol)
-                spread = ask_price - bid_price
-                fair_price = mid_price + (volume_imbalance * spread / 2)
+                if ask_vol + bid_vol > 0:
+                    mid_price = ((ask_price * ask_vol) + (bid_price * bid_vol)) / (ask_vol + bid_vol)
+                    volume_imbalance = (bid_vol - ask_vol) / (bid_vol + ask_vol)
+                    spread = ask_price - bid_price
+                    fair_price = mid_price + (volume_imbalance * spread / 2)
 
             if len(order_depth.sell_orders) != 0:
                 ask_price, ask_quantity = list(order_depth.sell_orders.items())[0]
