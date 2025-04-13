@@ -1,0 +1,22 @@
+goal: earn as many seashells as possible to bring island to prosperity through algorithmic trading
+
+15 day competition; 5 rounds and each 72 hours
+
+submitting a trading algorithm class
+    - will trade against a number of bots on exchange
+    - different products available on each day, sample data available for each
+
+Trader Class with single method called run 
+    - larger # of iterations in simulation, each iteraction will call run method with input TradingState object
+    - run method has TradingState input
+        - all trades since last iteration, own and market
+        - per product overview of buy/selll orders (quotes)
+    
+        - based on logic run method will send orders that fully/partially match with existing orders
+            - sending buy order with price >= bot quotes
+                - if quanity > bot quote diffferst will be left as outsanding buy
+        - next TradingState indicates if bots did decide to trade
+    
+every trade changes the position (quanity) of a product, limits for each
+
+
