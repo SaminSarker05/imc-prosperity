@@ -2,14 +2,12 @@ from datamodel import OrderDepth, TradingState, Order
 from typing import *
 import string
 
+"""
+    - .csv file with trade and market order examples
+"""
+
 
 class Trader:
-    """
-        weighted mid price with volume imbalance strategy
-        - calculate fair price with volume weighted average of best bid ask prices
-        - adjust fair price based on volume impanance in order book
-            - scale by half bid-ask spread
-    """
 
     def run(self, state: TradingState):
         print("traderData:", state.traderData)
@@ -20,19 +18,11 @@ class Trader:
             order_depth: OrderDepth = state.order_depths[product]
             orders: List[Order] = []
             fair_price = 10
-    
-            if len(order_depth.sell_orders) != 0 and len(order_depth.buy_orders) != 0:
-                ask_price, ask_vol = list(order_depth.sell_orders.items())[0]
-                bid_price, bid_vol = list(order_depth.buy_orders.items())[0]
+            print("fair price: ", fair_price)
 
-                mid_price = ((ask_price * ask_vol) + (bid_price * bid_vol)) / (ask_vol + bid_vol)
-                volume_imbalance = (bid_vol - ask_vol) / (bid_vol + ask_vol)
-                spread = ask_price - bid_price
-                fair_price = mid_price + (volume_imbalance * spread / 2)
-
-            if len(order_depth.sell_orders) != 0:
-                ask_price, ask_quantity = list(order_depth.sell_orders.items())[0]
-                if ask_price < fair_price:  # buy if below fair value
+            if len(order_depth.sell_orders) != 0:  # check if outstanding sell orders exist
+                ask_price, ask_quantity = list(order_depth.sell_orders.items())[0]  # get best ask price and quantity
+                if ask_price < fair_price:  # buy if below estimated fair value
                     print("BUY", -ask_quantity, product, "@" + str(ask_price))
                     orders.append(Order(product, ask_price, -ask_quantity))
             

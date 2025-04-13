@@ -2,6 +2,12 @@ day 1:
     - rainforest_resin
     - kelp
     - squid_ink
+day 2:
+    can trade two types of picnic baskets or individual items
+    - picnic_basket1, picnic_basket2
+    - croissants
+    - jams
+    - djembes
 
 
 ---- trading
