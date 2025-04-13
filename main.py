@@ -1,3 +1,9 @@
+"""
+    - add logic for not exceding position limits
+    current shells = 49
+"""
+
+
 from datamodel import OrderDepth, TradingState, Order
 from typing import *
 import string
