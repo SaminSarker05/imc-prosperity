@@ -1,4 +1,11 @@
+day 1:
+    - rainforest_resin
+    - kelp
+    - squid_ink
+
+
 goal: earn as many seashells as possible to bring island to prosperity through algorithmic trading
+    - use algo to decide fair value price and price_levels to build trades
 
 15 day competition; 5 rounds and each 72 hours
 
@@ -18,5 +25,43 @@ Trader Class with single method called run
         - next TradingState indicates if bots did decide to trade
     
 every trade changes the position (quanity) of a product, limits for each
+    - per product basis with absolte value limits 
 
+each submission generates unique identification
+trading container based on AWS lambda function
+
+
+[TradingState]:
+    - all important market information for algo to make decisions
+
+    own_trades: trades algo itself has done since last TradingState iteration
+        - dictionary of [Trade] objects with key being product names
+    
+    market_trades: trades of other market participants since last iteration
+        - dictionary of [Trade] objects with key being product names
+    
+    position: lost/short posiiton of player in every product
+        - dictionary with key being product names and values signed integers
+    
+    order_depths: all buy/sell orders per product of other market_participants that algo is able to trade with
+        - dict with keys products and values [OrderDepth] class 
+
+[Trade]:
+    - symbol, buy, price, quantity, buyer, seller, timestamp
+
+[OrderDepth]:
+    - buy_orders, sell_orders
+    - all outsanding buy/sell
+    - keys are price_levels and quanity for that price, negative for sell_orders 
+
+[Order]:
+    - value for return result dictionary of run method
+        - keys are product names, vaulues are of type Order
+    
+    - symbol, price (max for buy, min for sell), quantity
+
+python notes:
+
+typing module for support of type hints and type checking
+    variable_name: variable_type
 
