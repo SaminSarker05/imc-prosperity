@@ -1,6 +1,10 @@
 """
     - add logic for not exceding position limits
     current shells = 49
+    
+    [NOW]
+    - add pnl metric to compute algo performance from logs
+    - add sharpe ratio
 """
 
 

@@ -16,7 +16,11 @@ outsanding = open/active
 ask = lowest price seller willing to sell
 bid = highest price buyer willing to buy
 
-orderbooks often sorted so can grab best ask/bid prices from top
+orderbooks often sorted for quick can grab of best ask/bid prices from top
+
+pnl = profit and loss: profit and loss a trader incurs from trades. diff between assets entry and exit price
+
+
 
 
 ---- game
