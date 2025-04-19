@@ -7,6 +7,14 @@ import string
 """
 
 
+"""
+    weighted mid price with volume imbalance strategy
+    - calculate fair price with volume weighted average of best bid ask prices
+    - adjust fair price based on volume imbalance in order book
+        - scale by half of bid-ask spread
+"""
+
+
 class Trader:
 
     def run(self, state: TradingState):

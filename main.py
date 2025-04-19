@@ -1,61 +1,62 @@
 """
-    - add logic for not exceding position limits
-    current shells = 49
+    CURRENT_SHELLS = 49
+    - MY STRATS
+        volume weighted midprice with imbalance adjustment
 
-    [NOW]
+    [TOdo]
+        - add actual limits for each product
+
+    [DONE]
     - add pnl metric to compute algo performance from logs
-    - add sharpe ratio
+    - add logic for not exceding position limits
 """
-
 
 from datamodel import OrderDepth, TradingState, Order
 from typing import *
 import string
 
-{
-    "pnl": 0.0,
-    "positions": {}
-}
-
 
 class Trader:
-    # global vars for posiiton limits
-    MAX_POS = 10
-
-    """
-        weighted mid price with volume imbalance strategy
-        - calculate fair price with volume weighted average of best bid ask prices
-        - adjust fair price based on volume imbalance in order book
-            - scale by half of bid-ask spread
-    """
+    # class level dict for position limits
+    MAX_POS = {
+        "MAGNIFICENT_MACARONS": 75,
+        "VOLCANIC_ROCK": 400,
+        "CROISSANTS": 250,
+        "JAMS": 350,
+        "DJEMBES": 60,
+        "PICNIC_BASKET1": 60,
+        "PICNIC_BASKET2": 100
+    }
 
     def run(self, state: TradingState):
         # store pnl cash and position of each product in traderData memory
         # differentiate between realized and unrealized pnl
         memory = state.traderData if state.traderData else {
-            "pnl": 0.0,
+            "cash": 0.0,
             "positions": {}
         }
 
-        # calculate realized pnl by processing own trades from last iteration 
+        # process own trades from last run to calculate realized pnl and position
         for product, trades in state.own_trades.items():  # dict of Trade objects
             for trade in trades:
                 price = trade.price
-                qty = trade.quantity  # pos if buy trade, neg if sell
+                qty = trade.quantity  # positive if buy, negative if sell
 
                 prev_pos = memory["positions"].get(product, 0)
                 memory["positions"][product] = prev_pos + qty
 
-                memory["pnl"] += (price * -qty)
+                # realized or executed cash
+                memory["cash"] += (price * -qty)
 
-        print("total pnl: ", memory["pnl"])
+        print("total pnl: ", memory["cash"])
 
         result = {}
 
         for product in state.order_depths:
             order_depth: OrderDepth = state.order_depths[product]
             orders: List[Order] = []
-            fair_price: float = 10.0
+            fair_price = 10.0  # fallback price
+            max_pos_limit = self.MAX_POS.get(product, 0)
 
             # current position for product
             position = memory["positions"].get(product, 0)
@@ -81,7 +82,7 @@ class Trader:
                     # quantities in sell order are negative so negate to get correct volume
                     
                     # ensure BUY position below product limit
-                    buy_qty = min(-ask_qty, MAX_POS - position)
+                    buy_qty = min(-ask_qty, max_pos_limit - position)
                     if buy_qty > 0:
                         orders.append(Order(product, ask_price, buy_qty))
                         print("BUY", buy_qty, product, "@" + str(ask_price))
