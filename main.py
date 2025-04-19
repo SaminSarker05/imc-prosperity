@@ -16,7 +16,7 @@
 from datamodel import OrderDepth, TradingState, Order
 from typing import *
 import string
-
+import jsonpickle
 
 class Trader:
     # class level dict for position limits
@@ -38,7 +38,9 @@ class Trader:
         ask_price, ask_vol = list(order_depth.sell_orders.items())[0]
         bid_price, bid_vol = list(order_depth.buy_orders.items())[0]
 
-        # if ask_vol + bid_vol > 0:
+        if ask_vol + bid_vol == 0:
+            return 10.0, 0, 0
+        
         mid_price = ((ask_price * ask_vol) + (bid_price * bid_vol)) / (ask_vol + bid_vol)
 
         spread = ask_price - bid_price
@@ -55,6 +57,9 @@ class Trader:
             "cash": 0.0,
             "positions": {}
         }
+
+        # deserialize
+        memory = jsonpickle.decode(memory)
 
         # process own trades from last run to calculate realized pnl and position
         for product, trades in state.own_trades.items():  # dict of Trade objects
@@ -82,7 +87,7 @@ class Trader:
             position = memory["positions"].get(product, 0)
 
             # calculate fair price of product
-            fair_price, vol_imbalance, spread = calculate_fair_price(order_depth)
+            fair_price, vol_imbalance, spread = self.calculate_fair_price(order_depth)
             
             # reduce market noise with price margin, using spread for aggresiveness
             if spread:
@@ -118,4 +123,7 @@ class Trader:
             result[product] = orders
 
         traderData = memory
+
+        # serialize
+        traderData = jsonpickle.encode(traderData)
         return result, 1, traderData
