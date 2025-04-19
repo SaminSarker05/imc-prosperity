@@ -18,7 +18,10 @@ bid = highest price buyer willing to buy
 
 orderbooks often sorted for quick can grab of best ask/bid prices from top
 
-pnl = profit and loss: profit and loss a trader incurs from trades. diff between assets entry and exit price
+pnl = profit and loss: profit and loss a trader incurs from trades. 
+    diff between assets entry and exit price, two types
+    - realized: profit/loss from completed or closed trade
+    - unrealized: profit/loss from 
 
 
 
@@ -74,7 +77,7 @@ trading container based on AWS lambda function
     - buy_orders, sell_orders
     - all outsanding buy/sell
     - keys are price_levels and quanity for that price, negative for sell_orders 
-    - negative quantiies for sell_orders
+    - sell_orders have negative quantities
 
 [Order]:
     - value for return result dictionary of run method
