@@ -94,7 +94,6 @@ class Trader:
                     price_margin = 1
             
             # build and place order, ensure positon limit respected
-
             if len(order_depth.sell_orders) != 0:
                 ask_price, ask_qty = list(order_depth.sell_orders.items())[0]
                 if ask_price < (fair_price - price_margin):  # BUY if product below fair price value
