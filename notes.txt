@@ -23,7 +23,7 @@ pnl = profit and loss: profit and loss a trader incurs from trades.
     - realized: profit/loss from completed or closed trade
     - unrealized: profit/loss from 
 
-
+spread of bid/ask can be indicative of alpha and arbitrage opportunites
 
 
 ---- game

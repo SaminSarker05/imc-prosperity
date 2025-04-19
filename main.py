@@ -2,13 +2,15 @@
     CURRENT_SHELLS = 49
     - MY STRATS
         volume weighted midprice with imbalance adjustment
+        alpha indications through bid/ask spread and price margins
+            more aggresive on wider spreads
 
     [TOdo]
-        - add actual limits for each product
 
     [DONE]
     - add pnl metric to compute algo performance from logs
     - add logic for not exceding position limits
+    - add actual limits for each product
 """
 
 from datamodel import OrderDepth, TradingState, Order
@@ -27,6 +29,24 @@ class Trader:
         "PICNIC_BASKET1": 60,
         "PICNIC_BASKET2": 100
     }
+
+    def calculate_fair_price(self, order_depth: OrderDepth) -> Tuple[float, float, float]:
+        if not order_depth.sell_orders or not order_depth.buy_orders:
+            return 10.0, 0, 0
+
+        # calculate fair price value using outstanding orders in market
+        ask_price, ask_vol = list(order_depth.sell_orders.items())[0]
+        bid_price, bid_vol = list(order_depth.buy_orders.items())[0]
+
+        # if ask_vol + bid_vol > 0:
+        mid_price = ((ask_price * ask_vol) + (bid_price * bid_vol)) / (ask_vol + bid_vol)
+
+        spread = ask_price - bid_price
+        vol_imbalance = (bid_vol - ask_vol) / (bid_vol + ask_vol)
+        fair_price = mid_price + (vol_imbalance * spread / 2)
+        
+        return fair_price, vol_imbalance, spread
+        
 
     def run(self, state: TradingState):
         # store pnl cash and position of each product in traderData memory
@@ -55,30 +75,29 @@ class Trader:
         for product in state.order_depths:
             order_depth: OrderDepth = state.order_depths[product]
             orders: List[Order] = []
-            fair_price = 10.0  # fallback price
+            price_margin = 0
             max_pos_limit = self.MAX_POS.get(product, 0)
 
             # current position for product
             position = memory["positions"].get(product, 0)
 
-            # calculate fair price value using outstanding orders in market
-            if len(order_depth.sell_orders) != 0 and len(order_depth.buy_orders) != 0:
-                ask_price, ask_vol = list(order_depth.sell_orders.items())[0]
-                bid_price, bid_vol = list(order_depth.buy_orders.items())[0]
-
-                if ask_vol + bid_vol > 0:
-                    mid_price = ((ask_price * ask_vol) + (bid_price * bid_vol)) / (ask_vol + bid_vol)
-
-                    # [LOGIC] here
-                    volume_imbalance = (bid_vol - ask_vol) / (bid_vol + ask_vol)
-                    spread = ask_price - bid_price
-                    fair_price = mid_price + (volume_imbalance * spread / 2)
-
+            # calculate fair price of product
+            fair_price, vol_imbalance, spread = calculate_fair_price(order_depth)
+            
+            # reduce market noise with price margin, using spread for aggresiveness
+            if spread:
+                if spread < 2:
+                    price_margin = 0.1
+                elif spread < 5:
+                    price_margin = 0.5
+                else:
+                    price_margin = 1
+            
             # build and place order, ensure positon limit respected
 
             if len(order_depth.sell_orders) != 0:
                 ask_price, ask_qty = list(order_depth.sell_orders.items())[0]
-                if ask_price < fair_price:  # BUY if product below fair price value
+                if ask_price < (fair_price - price_margin):  # BUY if product below fair price value
                     # quantities in sell order are negative so negate to get correct volume
                     
                     # ensure BUY position below product limit
@@ -89,7 +108,7 @@ class Trader:
             
             if len(order_depth.buy_orders) != 0:
                 bid_price, bid_qty = list(order_depth.buy_orders.items())[0]
-                if bid_price > fair_price:  # SELL product price if above fair value
+                if bid_price > (fair_price + price_margin):  # SELL product price if above fair value
                     # ensure SELL only if existing outstanding position
                 
                     sell_qty = min(bid_qty, position)
